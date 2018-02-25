@@ -394,8 +394,7 @@ function edit_save(editType){
 
 
 function mass_act(type){
-	buffer = get_all_cbox_selected('xplTable', 'xpl_href');
-
+	buffer = get_all_cbox_selected('xplTable', 'xpl_href');	
 	if((type=='cut')||(type=='copy')){
 		localStorage.setItem('bufferLength', buffer.length);
 		localStorage.setItem('bufferAction', type);
@@ -464,7 +463,7 @@ function mass_act(type){
 			massBuffer = $.trim(massBuffer);
 			title = type;
 
-			content = "<table class='boxtbl'><tr><td colspan='2'><textarea class='massBuffer' style='height:120px;min-height:120px;' wrap='off' disabled>"+massBuffer+"</textarea></td></tr><tr><td class='colFit'>Archive</td><td><input class='massValue' type='text' value='"+arcFilename+"' onkeydown=\"trap_enter(event, 'mass_act_go_"+arcType+"');\"></td></tr><tr><td colspan='2'><span class='button' onclick=\"mass_act_go('"+arcType+"');\">compress</span></td></tr></table>";
+			content = "<table class='boxtbl'><tr><td colspan='2'><textarea class='massBuffer' style='height:120px;min-height:120px;' wrap='off' disabled>"+massBuffer+"</textarea></td></tr><tr><td class='colFit'>Archive</td><td><input class='massValue' type='text' value='"+arcFilename+"' onkeydown=\"trap_enter(event, 'mass_act_go_"+arcType+"');\"></td></tr><tr><td>Ignore Extensions</td><td><input type='text' value='zip,tar' class='massIgnore' name='ignore_val'/></td></tr><tr><td colspan='2'><span class='button' onclick=\"mass_act_go('"+arcType+"');\">compress</span></td></tr></table>";
 			show_box(ucfirst(title), content);
 		}
 	}
@@ -537,6 +536,7 @@ function mass_act_go(massType){
 	massBuffer = $.trim($('.massBuffer').val());
 	massPath = get_cwd();
 	massValue = '';
+	massIgnore='';
 	if(massType=='paste'){
 		bufferLength = localStorage.getItem('bufferLength');
 		bufferAction = localStorage.getItem('bufferAction');
@@ -557,6 +557,7 @@ function mass_act_go(massType){
 	}
 	else if((massType=='tar')||(massType=='targz')||(massType=='zip')){
 		massValue = $('.massValue').val();
+		massIgnore = $('.massIgnore').val();
 	}
 	else if((massType=='untar')||(massType=='untargz')||(massType=='unzip')){
 		massValue = $('.massValue').val();
@@ -564,7 +565,7 @@ function mass_act_go(massType){
 
 
 	if(massBuffer!=''){
-		send_post({massType:massType,massBuffer:massBuffer,massPath:massPath,massValue:massValue }, function(res){
+		send_post({massType:massType,massBuffer:massBuffer,massPath:massPath,massValue:massValue,massIgnore:massIgnore }, function(res){
 			if(res!='error'){
 				$('.boxresult').html(res+' Operation(s) succeeded');
 			}

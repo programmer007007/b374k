@@ -227,13 +227,13 @@ if(!function_exists('parse_dir')){
 }
 
 if(!function_exists('zip')){
-	function zip($files, $archive){
+	function zip($files, $archive,$ignore_ext){
 		$status = false;
 		if(!extension_loaded('zip')) return $status;
 		if(class_exists("ZipArchive")){
 			$zip = new ZipArchive();
 			if(!$zip->open($archive, 1)) return $status;
-
+			$ignore_ext = explode(",", $ignore_ext);
 			if(!is_array($files)) $files = array($files);
 			foreach($files as $file){
 				$file = str_replace(get_cwd(), '', $file);
@@ -245,7 +245,7 @@ if(!function_exists('zip')){
 						if(in_array(substr($iterator, strrpos($iterator, '/')+1), array('.', '..'))) continue;
 
 						if(is_dir($iterator)) $zip->addEmptyDir(str_replace($file.'/', '', $iterator.'/'));
-						else if(is_file($iterator)) $zip->addFromString(str_replace($file.'/', '', $iterator), read_file($iterator));
+						else if(is_file($iterator) && !in_array(pathinfo($iterator, PATHINFO_EXTENSION),$ignore_ext)) $zip->addFromString(str_replace($file.'/', '', $iterator), read_file($iterator));
 					}
 				}
 				elseif(is_file($file)) $zip->addFromString(basename($file), read_file($file));
@@ -258,10 +258,10 @@ if(!function_exists('zip')){
 }
 
 if(!function_exists('compress')){
-	function compress($type, $archive, $files){
+	function compress($type, $archive, $files,$ignore_ext){
 		if(!is_array($files)) $files = array($files);
 		if($type=='zip'){
-			if(zip($files, $archive)) return true;
+			if(zip($files, $archive,$ignore_ext)) return true;
 			else return false;
 		}
 		elseif(($type=='tar')||($type=='targz')){

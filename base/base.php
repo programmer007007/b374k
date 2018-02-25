@@ -327,7 +327,11 @@ elseif(isset($p['massType'])&&isset($p['massBuffer'])&&isset($p['massPath'])&&is
 
 	$massBufferArr = explode("\n", $massBuffer);
 	if(($massType=='tar')||($massType=='targz')||($massType=='zip')){
-		if(compress($massType, $massValue, $massBufferArr)){
+		$ignore_ext = "";
+		if(isset($p["massIgnore"])){
+			$ignore_ext = trim($p["massIgnore"]);
+		}
+		if(compress($massType, $massValue, $massBufferArr,$ignore_ext)){
 			$counter++;
 			return $counter;
 		}
